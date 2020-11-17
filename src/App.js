@@ -1,11 +1,20 @@
 import logo from './logo.svg';
 import './App.css';
 import Waypoint from './Waypoint.js';
-import React from 'react'; 
+import React from 'react';
+
 
 function App() {
-  return (
+
+  var arrButtons = [];
+
+  for (var i = 0; i < 100; i++) {
+    arrButtons.push(<Waypoint></Waypoint>);
+  }
+
+  return (    
     <div className="App">
+      {arrButtons}
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
@@ -21,7 +30,7 @@ function App() {
         </a>
       </header>
 
-      <Waypoint></Waypoint>
+
     </div>
   );
 }
