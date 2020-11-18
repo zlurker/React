@@ -5,31 +5,45 @@ import React from 'react';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import NodeType from './Utils';
 
-var arrButtons = [];
+var nodes = [];
 
-function ChangeActionType(evt){
+function ChangeActionType(evt) {
+
   window.$clickState = evt;
 }
 
+function BeginPathfinder() {
+  //for (let i = 0; i < nodes.length; i++)
+    //nodes[i].setState("Obstacle");
+}
+
 function App() {
+  nodes = [];
+
   for (var i = 0; i < 10; i++) {
     for (var j = 0; j < 10; j++) {
-      arrButtons.push(<Waypoint></Waypoint>);
+      nodes.push(<Waypoint></Waypoint>);
     }
-    arrButtons.push(<br></br>);
+
+    nodes.push(<br></br>);
   }
 
   return (
     <div className="App">
       <DropdownButton title='Paint' onSelect={ChangeActionType}>
-        <Dropdown.Item eventKey="Obstacle">Obstacle</Dropdown.Item>
-        <Dropdown.Item eventKey="Endpoint">Endpoint</Dropdown.Item>
-        <Dropdown.Item eventKey="Startpoint">Startpoint</Dropdown.Item>
-        <Dropdown.Item eventKey="Normal">Empty</Dropdown.Item>
+        <Dropdown.Item eventKey={NodeType.Normal}>Empty</Dropdown.Item>
+        <Dropdown.Item eventKey={NodeType.Endpoint}>Endpoint</Dropdown.Item>
+        <Dropdown.Item eventKey={NodeType.Startpoint}>Startpoint</Dropdown.Item>
+        <Dropdown.Item eventKey={NodeType.Obstacle}>Obstacle</Dropdown.Item>
       </DropdownButton>
 
-      {arrButtons}
+      <button onClick={BeginPathfinder}>
+        Visualize Pathfinder
+      </button><br></br>
+
+      {nodes}
 
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
