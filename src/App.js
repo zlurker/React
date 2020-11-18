@@ -24,8 +24,10 @@ function App() {
   return (
     <div className="App">
       <DropdownButton title='Paint' onSelect={ChangeActionType}>
-        <Dropdown.Item eventKey={0}>Obstacle</Dropdown.Item>
-        <Dropdown.Item eventKey={1}>Endpoint</Dropdown.Item>
+        <Dropdown.Item eventKey="Obstacle">Obstacle</Dropdown.Item>
+        <Dropdown.Item eventKey="Endpoint">Endpoint</Dropdown.Item>
+        <Dropdown.Item eventKey="Startpoint">Startpoint</Dropdown.Item>
+        <Dropdown.Item eventKey="Normal">Empty</Dropdown.Item>
       </DropdownButton>
 
       {arrButtons}

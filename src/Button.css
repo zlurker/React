@@ -1,4 +1,4 @@
-.ButtonUI {
+.Normal {
     border: none;
     padding: 20px 20px;
     margin-right: 1px;
@@ -6,3 +6,34 @@
     margin-top:1px;
     margin-bottom: 1px;
 }
+
+.Obstacle{
+    border: none;
+    background-color: black;
+    padding: 20px 20px;
+    margin-right: 1px;
+    margin-left: 1px;
+    margin-top:1px;
+    margin-bottom: 1px;
+}
+
+.Endpoint{
+    border: none;
+    background-color: green;
+    padding: 20px 20px;
+    margin-right: 1px;
+    margin-left: 1px;
+    margin-top:1px;
+    margin-bottom: 1px;
+}
+
+.Startpoint{
+    border: none;
+    background-color: red;
+    padding: 20px 20px;
+    margin-right: 1px;
+    margin-left: 1px;
+    margin-top:1px;
+    margin-bottom: 1px;
+}
+

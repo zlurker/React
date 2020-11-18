@@ -6,12 +6,19 @@ class Waypoint extends React.Component {
 
   constructor(props) {
     super(props);
-  } 
+    this.state = {
+      style: "Normal"
+    }
+  }
+
+  changeColor() {
+    this.setState({ style: window.$clickState })
+  }
 
   render() {
+
     return (
-      <button className="ButtonUI" onClick={function () { alert(window.$clickState); }}>
-        {this.props.value}
+      <button className={this.state.style} onClick={this.changeColor.bind(this)}>
       </button>
     );
   }
