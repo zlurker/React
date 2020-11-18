@@ -15,10 +15,10 @@ function ChangeActionType(evt) {
 }
 
 function BeginPathfinder() {
-  //for (let i = 0; i < nodes.length; i++)
-    //nodes[i].setState("Obstacle");
+  App();
 }
 
+// Use this as purely entry point?
 function App() {
   nodes = [];
 
