@@ -6,14 +6,13 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+var arrButtons = [];
+
 function ChangeActionType(evt){
   window.$clickState = evt;
 }
 
 function App() {
-
-  var arrButtons = [];
-
   for (var i = 0; i < 10; i++) {
     for (var j = 0; j < 10; j++) {
       arrButtons.push(<Waypoint></Waypoint>);

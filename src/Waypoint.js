@@ -6,6 +6,8 @@ class Waypoint extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.changeColor = this.changeColor.bind(this);
     this.state = {
       style: "Normal"
     }
@@ -18,7 +20,7 @@ class Waypoint extends React.Component {
   render() {
 
     return (
-      <button className={this.state.style} onClick={this.changeColor.bind(this)}>
+      <button className={this.state.style} onClick={this.changeColor}>
       </button>
     );
   }
