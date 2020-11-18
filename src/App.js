@@ -6,8 +6,8 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function Test(evt){
-  console.log(evt)
+function ChangeActionType(evt){
+  window.$clickState = evt;
 }
 
 function App() {
@@ -23,9 +23,9 @@ function App() {
 
   return (
     <div className="App">
-      <DropdownButton title='Dropdowna' onSelect={Test}>
-        <Dropdown.Item eventKey='abc'>Dropdown link</Dropdown.Item>
-        <Dropdown.Item eventKey={['a', 'b']}>Dropdown link</Dropdown.Item>
+      <DropdownButton title='Paint' onSelect={ChangeActionType}>
+        <Dropdown.Item eventKey={0}>Obstacle</Dropdown.Item>
+        <Dropdown.Item eventKey={1}>Endpoint</Dropdown.Item>
       </DropdownButton>
 
       {arrButtons}
