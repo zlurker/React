@@ -6,6 +6,10 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+function Test(evt){
+  console.log(evt)
+}
+
 function App() {
 
   var arrButtons = [];
@@ -19,19 +23,13 @@ function App() {
 
   return (
     <div className="App">
-      <Dropdown>
-        <Dropdown.Toggle variant="success" id="dropdown-basic">
-          Dropdown Button
-  </Dropdown.Toggle>
-
-        <Dropdown.Menu>
-          <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-          <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-          <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
+      <DropdownButton title='Dropdowna' onSelect={Test}>
+        <Dropdown.Item eventKey='abc'>Dropdown link</Dropdown.Item>
+        <Dropdown.Item eventKey={['a', 'b']}>Dropdown link</Dropdown.Item>
+      </DropdownButton>
 
       {arrButtons}
+
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
