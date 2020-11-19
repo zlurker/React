@@ -46,12 +46,10 @@ class AppEntry extends React.Component {
     }
 
     GetId(x, y) {
-        let id = (y * this.yWidth) + x;
+        if (x < 0 || x >= this.xWidth || y < 0 || y >= this.yWidth)
+            return -1;
 
-        if (id >= this.yWidth * this.xWidth)
-            id = -1;
-
-        return id;
+        return (y * this.yWidth) + x;
     }
 
     ChangeActionType(evt) {
@@ -98,7 +96,7 @@ class AppEntry extends React.Component {
             let id = this.GetId(nodeCoords[0] + directions[i][0], nodeCoords[1] + directions[i][1]);
 
             console.log(id);
-            
+
             if (id > -1 && !this.explored.includes(id) && this.nodeStatus[id] != NodeType.Obstacle) {
                 this.unvisited.push(id);
                 this.explored.push(id);
@@ -136,7 +134,7 @@ class AppEntry extends React.Component {
     BeginPathfinder() {
         this.currentNode = this.startNode;
         this.unvisited = [];
-        this.explored = [this.startNode];       
+        this.explored = [this.startNode];
         this.intervalId = setInterval(this.PathfinderLoop, 50);
     }
 
