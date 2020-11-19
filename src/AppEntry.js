@@ -23,20 +23,23 @@ class AppEntry extends React.Component {
         window.$clickState = evt;
     }
 
-    NodeStateChange(nodeid){
+    NodeStateChange(nodeid) {
         console.log("Called by nodeid" + nodeid);
     }
 
     BeginPathfinder() {
-       
+
     }
 
     render() {
         let nodes = [];
 
-        for (var i = 0; i < 10; i++) {
-            for (var j = 0; j < 10; j++) {
-                nodes.push(<Waypoint callback={this.NodeStateChange}/>);
+        var x = 10;
+        var y = 10;
+
+        for (var i = 0; i < y; i++) {
+            for (var j = 0; j < x; j++) {
+                nodes.push(<Waypoint callback={this.NodeStateChange} id={(i * y) + j} />);
             }
 
             nodes.push(<br></br>);
