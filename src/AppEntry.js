@@ -16,11 +16,13 @@ class AppEntry extends React.Component {
         this.GetCoordinates = this.GetCoordinates.bind(this);
         this.GetId = this.GetId.bind(this);
 
-        this.xWidth = 10;
-        this.yWidth = 10;
+        this.xWidth = 15;
+        this.yWidth = 15;
 
         this.painterState = NodeType.Normal;
         this.nodeStatus = Array(this.xWidth * this.yWidth).fill(NodeType.Normal);
+        this.startNode = -1;
+        this.endNode = -1;
 
         this.state = {
             iteration: 0
@@ -43,7 +45,22 @@ class AppEntry extends React.Component {
     }
 
     NodeStateChange(nodeid) {
-        console.log("Called by nodeid" + this.GetCoordinates(nodeid));
+
+        // Unsets previous SP/EP
+        if (this.painterState == NodeType.Startpoint) {
+            if (this.startNode > -1)
+                this.nodeStatus[this.startNode] = NodeType.Normal;
+
+            this.startNode = nodeid;
+        }
+
+        if (this.painterState == NodeType.Endpoint) {
+            if (this.endNode > -1)
+                this.nodeStatus[this.endNode] = NodeType.Normal;
+
+            this.endNode = nodeid;
+        }
+
         this.nodeStatus[nodeid] = this.painterState;
         this.setState({ iteration: this.state.iteration++ });
     }
@@ -55,11 +72,8 @@ class AppEntry extends React.Component {
     render() {
         let nodes = [];
 
-        var x = 10;
-        var y = 10;
-
-        for (var i = 0; i < y; i++) {
-            for (var j = 0; j < x; j++) {
+        for (var i = 0; i < this.yWidth; i++) {
+            for (var j = 0; j < this.xWidth; j++) {
                 var id = this.GetId(j, i);
                 nodes.push(<Waypoint callback={this.NodeStateChange} id={id} style={this.nodeStatus[id]} />);
             }
