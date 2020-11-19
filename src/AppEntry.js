@@ -80,7 +80,10 @@ class AppEntry extends React.Component {
         let coord0 = this.GetCoordinates(id0);
         let coord1 = this.GetCoordinates(id1);
 
-        return (Math.abs(coord1[0] - coord0[0]) + Math.abs(coord1[1] - coord0[1])) *2;
+        let x = Math.abs(coord1[0] - coord0[0]);
+        let y = Math.abs(coord1[1] - coord0[1]);
+
+        return (x*x) + (y*y);
     }
 
     PathfinderLoop() {
