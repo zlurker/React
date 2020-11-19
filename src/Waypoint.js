@@ -13,16 +13,13 @@ class Waypoint extends React.Component {
     }
   }
 
-  changeColor(event) {
-    this.props.callback(this.props.id);
+  changeColor(event) {    
     this.setState({ style: window.$clickState })
   }
 
   render() {
-
-    console.log("Rendering");
     return (
-      <button className={this.state.style} onMouseDown={this.changeColor}>
+      <button className={this.props.style} onClick={()=>{this.props.callback(this.props.id)}}>
       </button>
     );
   }

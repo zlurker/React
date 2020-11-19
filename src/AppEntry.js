@@ -14,14 +14,16 @@ class AppEntry extends React.Component {
         this.BeginPathfinder = this.BeginPathfinder.bind(this);
         this.NodeStateChange = this.NodeStateChange.bind(this);
         this.GetCoordinates = this.GetCoordinates.bind(this);
-        this.GetId = this.GetId.bind(this);      
+        this.GetId = this.GetId.bind(this);
 
-        this.NodeStatus = [];
         this.xWidth = 10;
         this.yWidth = 10;
 
+        this.painterState = NodeType.Normal;
+        this.nodeStatus = Array(this.xWidth * this.yWidth).fill(NodeType.Normal);
+
         this.state = {
-            style: "Normal"
+            iteration: 0
         }
     }
 
@@ -37,11 +39,13 @@ class AppEntry extends React.Component {
     }
 
     ChangeActionType(evt) {
-        window.$clickState = evt;
+        this.painterState = evt;
     }
 
     NodeStateChange(nodeid) {
         console.log("Called by nodeid" + this.GetCoordinates(nodeid));
+        this.nodeStatus[nodeid] = this.painterState;
+        this.setState({ iteration: this.state.iteration++ });
     }
 
     BeginPathfinder() {
@@ -55,8 +59,11 @@ class AppEntry extends React.Component {
         var y = 10;
 
         for (var i = 0; i < y; i++) {
-            for (var j = 0; j < x; j++)
-                nodes.push(<Waypoint callback={this.NodeStateChange} id={this.GetId(j, i)} />);
+            for (var j = 0; j < x; j++) {
+                var id = this.GetId(j, i);
+                nodes.push(<Waypoint callback={this.NodeStateChange} id={id} style={this.nodeStatus[id]} />);
+            }
+
 
             nodes.push(<br></br>);
         }
