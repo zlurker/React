@@ -32,7 +32,6 @@ class AppEntry extends React.Component {
         this.cost = Array(this.xWidth * this.yWidth).fill([-1, 0]);
         this.intervalId = 0;
 
-        console.log(this.cost);
         this.state = {
             iteration: 0
         }
@@ -90,7 +89,7 @@ class AppEntry extends React.Component {
             this.nodeStatus[this.currentNode] = NodeType.Visited;
 
         let nodeCoords = this.GetCoordinates(this.currentNode);
-        let directions = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1]];
+        let directions = [[-1, 0], [0, 1], [1, 0], [0, -1]];
 
         for (let i = 0; i < directions.length; i++) {
             let id = this.GetId(nodeCoords[0] + directions[i][0], nodeCoords[1] + directions[i][1]);
@@ -101,8 +100,10 @@ class AppEntry extends React.Component {
             if (this.nodeStatus[id] != NodeType.Obstacle && !this.explored.includes(id)) {
                 this.unvisited.push(id);
                 this.explored.push(id);
-                this.cost[id][0] = this.cost[this.currentNode][0] + 1;
-                this.cost[id][1] = this.DistanceBetweenId(id, this.endNode);
+                var nodeCost = [this.cost[this.currentNode][0] + 1,this.DistanceBetweenId(id, this.endNode)];
+                this.cost[id]= nodeCost;
+
+                console.log(this.cost[id]);
 
                 if (this.nodeStatus[id] != NodeType.Startpoint && this.nodeStatus[id] != NodeType.Endpoint)
                     this.nodeStatus[id] = NodeType.Unvisited;
@@ -132,6 +133,8 @@ class AppEntry extends React.Component {
 
 
         this.setState({ iteration: this.state.iteration++ });
+
+        console.log(this.cost);
     }
 
     BeginPathfinder() {
