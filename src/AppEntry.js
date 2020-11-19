@@ -103,18 +103,19 @@ class AppEntry extends React.Component {
 
         if (this.unvisited.length > 0) {
             let shortestDist = this.DistanceBetweenId(this.unvisited[0], this.currentNode);
-            let shortestIndex = this.unvisited[0];
+            let shortestIndex = 0;
 
             for (let i = 1; i < this.unvisited.length; i++) {
                 let dist = this.DistanceBetweenId(this.unvisited[i], this.currentNode);
 
                 if (dist < shortestDist){
-                    shortestIndex = this.unvisited[i];
+                    shortestIndex = i;
                     shortestDist = dist;
                 }
             }
-
-            this.currentNode = shortestIndex;
+           
+            this.currentNode = this.unvisited[shortestIndex];
+            this.unvisited.splice(shortestIndex,1);
         }
 
 
