@@ -3,7 +3,7 @@ import Waypoint from './Waypoint.js';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {NodeType,GetCoordinates,GetId} from './Utils';
+import { NodeType } from './Utils';
 
 class AppEntry extends React.Component {
 
@@ -13,10 +13,27 @@ class AppEntry extends React.Component {
         this.ChangeActionType = this.ChangeActionType.bind(this);
         this.BeginPathfinder = this.BeginPathfinder.bind(this);
         this.NodeStateChange = this.NodeStateChange.bind(this);
+        this.GetCoordinates = this.GetCoordinates.bind(this);
+        this.GetId = this.GetId.bind(this);      
+
+        this.NodeStatus = [];
+        this.xWidth = 10;
+        this.yWidth = 10;
 
         this.state = {
             style: "Normal"
         }
+    }
+
+    GetCoordinates(id) {
+        var x = id % this.yWidth;
+        var y = (id - x) / this.yWidth;
+
+        return [x, y];
+    }
+
+    GetId(x, y) {
+        return (y * this.yWidth) + x;
     }
 
     ChangeActionType(evt) {
@@ -24,7 +41,7 @@ class AppEntry extends React.Component {
     }
 
     NodeStateChange(nodeid) {
-        console.log("Called by nodeid" + GetCoordinates(nodeid));
+        console.log("Called by nodeid" + this.GetCoordinates(nodeid));
     }
 
     BeginPathfinder() {
@@ -39,7 +56,7 @@ class AppEntry extends React.Component {
 
         for (var i = 0; i < y; i++) {
             for (var j = 0; j < x; j++)
-                nodes.push(<Waypoint callback={this.NodeStateChange} id={GetId(j,i)} />);
+                nodes.push(<Waypoint callback={this.NodeStateChange} id={this.GetId(j, i)} />);
 
             nodes.push(<br></br>);
         }
