@@ -12,6 +12,7 @@ class AppEntry extends React.Component {
 
         this.ChangeActionType = this.ChangeActionType.bind(this);
         this.BeginPathfinder = this.BeginPathfinder.bind(this);
+        this.NodeStateChange = this.NodeStateChange.bind(this);
 
         this.state = {
             style: "Normal"
@@ -20,6 +21,10 @@ class AppEntry extends React.Component {
 
     ChangeActionType(evt) {
         window.$clickState = evt;
+    }
+
+    NodeStateChange(nodeid){
+        console.log("Called by nodeid" + nodeid);
     }
 
     BeginPathfinder() {
@@ -31,7 +36,7 @@ class AppEntry extends React.Component {
 
         for (var i = 0; i < 10; i++) {
             for (var j = 0; j < 10; j++) {
-                nodes.push(<Waypoint></Waypoint>);
+                nodes.push(<Waypoint callback={this.NodeStateChange}/>);
             }
 
             nodes.push(<br></br>);

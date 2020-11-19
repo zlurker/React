@@ -14,6 +14,7 @@ class Waypoint extends React.Component {
   }
 
   changeColor(event) {
+    this.props.callback("Test data");
     this.setState({ style: window.$clickState })
   }
 
