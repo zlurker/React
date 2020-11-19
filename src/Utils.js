@@ -2,7 +2,9 @@ const NodeType={
     Normal: "Normal",
     Obstacle: "Obstacle",
     Startpoint: "Startpoint",
-    Endpoint:"Endpoint"
+    Endpoint:"Endpoint",
+    Unvisited:"Unvisited",
+    Visited:"Visited"
   }
 
 var xWidth =10;
