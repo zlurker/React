@@ -5,4 +5,9 @@ const NodeType={
     Endpoint:"Endpoint"
   }
 
-  export default NodeType;
+function test(){
+  console.log("Test 123456789");
+} 
+
+
+export {NodeType,test};

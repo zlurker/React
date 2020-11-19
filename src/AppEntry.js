@@ -3,7 +3,7 @@ import Waypoint from './Waypoint.js';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NodeType from './Utils';
+import {NodeType,test} from './Utils';
 
 class AppEntry extends React.Component {
 
@@ -13,7 +13,8 @@ class AppEntry extends React.Component {
         this.ChangeActionType = this.ChangeActionType.bind(this);
         this.BeginPathfinder = this.BeginPathfinder.bind(this);
         this.NodeStateChange = this.NodeStateChange.bind(this);
-
+        test();
+        
         this.state = {
             style: "Normal"
         }
@@ -38,9 +39,8 @@ class AppEntry extends React.Component {
         var y = 10;
 
         for (var i = 0; i < y; i++) {
-            for (var j = 0; j < x; j++) {
+            for (var j = 0; j < x; j++)
                 nodes.push(<Waypoint callback={this.NodeStateChange} id={(i * y) + j} />);
-            }
 
             nodes.push(<br></br>);
         }

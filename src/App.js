@@ -5,7 +5,7 @@ import React from 'react';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import NodeType from './Utils';
+/*import NodeType from './Utils';
 
 var nodes = [];
 
@@ -64,3 +64,4 @@ function App() {
 }
 
 export default App;
+*/
