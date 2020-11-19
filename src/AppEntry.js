@@ -18,7 +18,7 @@ class AppEntry extends React.Component {
         this.DistanceBetweenId = this.DistanceBetweenId.bind(this);
         this.PathfinderLoop = this.PathfinderLoop.bind(this);
         this.GetId = this.GetId.bind(this);
-        
+
 
         this.xWidth = 15;
         this.yWidth = 15;
@@ -31,6 +31,7 @@ class AppEntry extends React.Component {
         this.currentNode = 0;
         this.unvisited = [];
         this.explored = [];
+        this.intervalId = 0;
 
         this.state = {
             iteration: 0
@@ -86,37 +87,47 @@ class AppEntry extends React.Component {
     }
 
     PathfinderLoop() {
-        this.nodeStatus[this.currentNode] = NodeType.Visited;
+
+        if (this.nodeStatus[this.currentNode] != NodeType.Startpoint && this.nodeStatus[this.currentNode] != NodeType.Endpoint)
+            this.nodeStatus[this.currentNode] = NodeType.Visited;
 
         let nodeCoords = this.GetCoordinates(this.currentNode);
-        let directions = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+        let directions = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1]];
 
         for (let i = 0; i < directions.length; i++) {
             let id = this.GetId(nodeCoords[0] + directions[i][0], nodeCoords[1] + directions[i][1]);
 
-            if (id > -1 && !this.explored.includes(id)) {
+            console.log(id);
+            
+            if (id > -1 && !this.explored.includes(id) && this.nodeStatus[id] != NodeType.Obstacle) {
                 this.unvisited.push(id);
                 this.explored.push(id);
-                this.nodeStatus[id] = NodeType.Unvisited;
+
+                if (this.nodeStatus[id] != NodeType.Startpoint && this.nodeStatus[id] != NodeType.Endpoint)
+                    this.nodeStatus[id] = NodeType.Unvisited;
             }
         }
 
         if (this.unvisited.length > 0) {
-            let shortestDist = this.DistanceBetweenId(this.unvisited[0], this.currentNode);
+            let shortestDist = this.DistanceBetweenId(this.unvisited[0], this.endNode);
             let shortestIndex = 0;
 
             for (let i = 1; i < this.unvisited.length; i++) {
-                let dist = this.DistanceBetweenId(this.unvisited[i], this.currentNode);
+                let dist = this.DistanceBetweenId(this.unvisited[i], this.endNode);
 
-                if (dist < shortestDist){
+                if (dist < shortestDist) {
                     shortestIndex = i;
                     shortestDist = dist;
                 }
             }
-           
+
             this.currentNode = this.unvisited[shortestIndex];
-            this.unvisited.splice(shortestIndex,1);
-        }
+            this.unvisited.splice(shortestIndex, 1);
+
+            if (this.currentNode == this.endNode)
+                clearInterval(this.intervalId);
+        } else
+            clearInterval(this.intervalId);
 
 
         this.setState({ iteration: this.state.iteration++ });
@@ -125,8 +136,8 @@ class AppEntry extends React.Component {
     BeginPathfinder() {
         this.currentNode = this.startNode;
         this.unvisited = [];
-        this.explored = [];
-        setInterval(this.PathfinderLoop, 200);
+        this.explored = [this.startNode];       
+        this.intervalId = setInterval(this.PathfinderLoop, 50);
     }
 
     render() {
