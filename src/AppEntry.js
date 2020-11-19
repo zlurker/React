@@ -18,8 +18,8 @@ class AppEntry extends React.Component {
         this.PathfinderLoop = this.PathfinderLoop.bind(this);
         this.GetId = this.GetId.bind(this);
 
-        this.xWidth = 15;
-        this.yWidth = 15;
+        this.xWidth = 10;
+        this.yWidth = 10;
 
         this.painterState = NodeType.Normal;
         this.nodeStatus = Array(this.xWidth * this.yWidth).fill(NodeType.Normal);
@@ -80,7 +80,7 @@ class AppEntry extends React.Component {
         let coord0 = this.GetCoordinates(id0);
         let coord1 = this.GetCoordinates(id1);
 
-        return Math.abs(coord1[0] - coord0[0]) + Math.abs(coord1[1] - coord0[1]);
+        return (Math.abs(coord1[0] - coord0[0]) + Math.abs(coord1[1] - coord0[1])) *2;
     }
 
     PathfinderLoop() {
@@ -97,13 +97,11 @@ class AppEntry extends React.Component {
             if (id < 0)
                 continue;
 
-            if (this.nodeStatus[id] != NodeType.Obstacle && !this.explored.includes(id)) {
+            if (this.nodeStatus[id] != NodeType.Obstacle && (this.cost[id][0] > this.cost[this.currentNode][0] + 1 || this.cost[id][0] < 0 || !this.explored.includes(id))) {
                 this.unvisited.push(id);
                 this.explored.push(id);
-                var nodeCost = [this.cost[this.currentNode][0] + 1,this.DistanceBetweenId(id, this.endNode)];
-                this.cost[id]= nodeCost;
+                this.cost[id] = [this.cost[this.currentNode][0] + 1, this.DistanceBetweenId(id, this.endNode)];
 
-                console.log(this.cost[id]);
 
                 if (this.nodeStatus[id] != NodeType.Startpoint && this.nodeStatus[id] != NodeType.Endpoint)
                     this.nodeStatus[id] = NodeType.Unvisited;
@@ -131,15 +129,13 @@ class AppEntry extends React.Component {
         } else
             clearInterval(this.intervalId);
 
-
         this.setState({ iteration: this.state.iteration++ });
-
-        console.log(this.cost);
     }
 
     BeginPathfinder() {
         this.currentNode = this.startNode;
         this.unvisited = [];
+        this.cost[this.currentNode] = [0, this.DistanceBetweenId(this.currentNode, this.endNode)];
         this.explored = [this.startNode];
         this.intervalId = setInterval(this.PathfinderLoop, 50);
     }
