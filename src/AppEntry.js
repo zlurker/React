@@ -4,7 +4,6 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { NodeType } from './Utils';
-import { ThemeConsumer } from 'react-bootstrap/esm/ThemeProvider';
 
 class AppEntry extends React.Component {
 
@@ -19,7 +18,6 @@ class AppEntry extends React.Component {
         this.PathfinderLoop = this.PathfinderLoop.bind(this);
         this.GetId = this.GetId.bind(this);
 
-
         this.xWidth = 15;
         this.yWidth = 15;
 
@@ -31,8 +29,10 @@ class AppEntry extends React.Component {
         this.currentNode = 0;
         this.unvisited = [];
         this.explored = [];
+        this.cost = Array(this.xWidth * this.yWidth).fill([-1, 0]);
         this.intervalId = 0;
 
+        console.log(this.cost);
         this.state = {
             iteration: 0
         }
@@ -95,11 +95,14 @@ class AppEntry extends React.Component {
         for (let i = 0; i < directions.length; i++) {
             let id = this.GetId(nodeCoords[0] + directions[i][0], nodeCoords[1] + directions[i][1]);
 
-            console.log(id);
+            if (id < 0)
+                continue;
 
-            if (id > -1 && !this.explored.includes(id) && this.nodeStatus[id] != NodeType.Obstacle) {
+            if (this.nodeStatus[id] != NodeType.Obstacle && !this.explored.includes(id)) {
                 this.unvisited.push(id);
                 this.explored.push(id);
+                this.cost[id][0] = this.cost[this.currentNode][0] + 1;
+                this.cost[id][1] = this.DistanceBetweenId(id, this.endNode);
 
                 if (this.nodeStatus[id] != NodeType.Startpoint && this.nodeStatus[id] != NodeType.Endpoint)
                     this.nodeStatus[id] = NodeType.Unvisited;
@@ -107,11 +110,11 @@ class AppEntry extends React.Component {
         }
 
         if (this.unvisited.length > 0) {
-            let shortestDist = this.DistanceBetweenId(this.unvisited[0], this.endNode);
+            let shortestDist = this.cost[this.unvisited[0]][0] + this.cost[this.unvisited[0]][1];
             let shortestIndex = 0;
 
             for (let i = 1; i < this.unvisited.length; i++) {
-                let dist = this.DistanceBetweenId(this.unvisited[i], this.endNode);
+                let dist = this.cost[this.unvisited[i]][0] + this.cost[this.unvisited[i]][1];
 
                 if (dist < shortestDist) {
                     shortestIndex = i;
