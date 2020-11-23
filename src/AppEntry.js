@@ -3,7 +3,7 @@ import Waypoint from './Waypoint.js';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { NodeType } from './Utils';
+import { NodeType,SetNodes } from './Utils';
 
 class AppEntry extends React.Component {
 
@@ -73,6 +73,8 @@ class AppEntry extends React.Component {
         }
 
         this.nodeStatus[nodeid] = this.painterState;
+
+        SetNodes(nodeid,this.painterState);
         this.setState({ iteration: this.state.iteration++ });
     }
 

@@ -1,31 +1,30 @@
-const NodeType={
-    Normal: "Normal",
-    Obstacle: "Obstacle",
-    Startpoint: "Startpoint",
-    Endpoint:"Endpoint",
-    Unvisited:"Unvisited",
-    Visited:"Visited"
-  }
-
-var xWidth =10;
-var yWidth =10;
-
-function test(){
-  console.log("Test 123456789");
-} 
+import $ from 'jquery';
 
 
-function GetCoordinates(id){
-  var x= id % yWidth;
-  var y = (id -x)/yWidth;
-  
-  return [x,y];
+const NodeType = {
+  Normal: "Normal",
+  Obstacle: "Obstacle",
+  Startpoint: "Startpoint",
+  Endpoint: "Endpoint",
+  Unvisited: "Unvisited",
+  Visited: "Visited"
 }
 
-function GetId(x,y){
-  return (y * yWidth) + x;
+function GetNodes() {
+
+}
+
+function SetNodes(id, nodetype) {
+
+  console.log("setting node - ");
+
+  const requestOptions = {
+    method: 'POST',
+  };
+
+  fetch('https://localhost:44391/SetNode?nodeId=' + id + "&nodeState=" + nodetype, requestOptions).then(response => console.log(response)).catch(error=>console.log(error));
 }
 
 
 
-export {NodeType,GetCoordinates,GetId};
+export { NodeType, SetNodes };
