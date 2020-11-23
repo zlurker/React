@@ -53,6 +53,10 @@ class AppEntry extends React.Component {
         }
     }
 
+    HandleXWidth(){
+
+    }
+
     ClearAllNodeData() {
         this.InitialiseNodeStatus();   
         this.setState({ triggerRender: this.state.triggerRender++ });
@@ -75,7 +79,6 @@ class AppEntry extends React.Component {
             for (var i = 0; i < this.explored.length; i++)
                 if (this.nodeStatus[this.explored[i]] == NodeType.Unvisited || this.nodeStatus[this.explored[i]] == NodeType.Visited)
                     this.SetNodeStatus([this.explored[i]], NodeType.Normal);
-
 
         this.currentNode = 0;
         this.unvisited = [];
@@ -211,9 +214,15 @@ class AppEntry extends React.Component {
 
                 this.SetNodeStatus([nodesData[i].NODE_ID], nodesData[i].NODE_TYPE);
             }
+        });
 
-
-            //this.setState({ iteration: this.state.iteration++ });
+        fetch('https://localhost:44391/RetrieveSettings', requestOptions).then(response => response.json()).then(data => {
+            var settingsData = JSON.parse(data);
+            this.setState({
+                x:settingsData.X,
+                y:settingsData.Y,
+                interval:settingsData.INTERVAL
+            });           
         });
     }
 
@@ -238,18 +247,27 @@ class AppEntry extends React.Component {
                     <Dropdown.Item eventKey={NodeType.Obstacle}>Obstacle</Dropdown.Item>
                 </DropdownButton>
 
-                <button onClick={this.BeginPathfinder}>
+                <input type ="text" value={this.state.x} />
+                <input type ="text" value={this.state.y} />
+                <br></br>
+
+                <input type ="text" value={this.state.interval}/>
+                <br></br>
+
+                <button  onClick={this.BeginPathfinder}>
                     Visualize Pathfinder
-                </button><br></br>
+                </button>
+                <br></br>
 
                 <button onClick={this.InitialiseStartingData}>
                     Clear Path Nodes
-                </button><br></br>
+                </button>
+                <br></br>
 
                 <button onClick={this.ClearAllNodeData}>
                     Clear All Data
-                </button><br></br>
-
+                </button>
+                <br></br>
 
                 {nodes}
             </div>

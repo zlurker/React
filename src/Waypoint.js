@@ -7,14 +7,9 @@ class Waypoint extends React.Component {
   constructor(props) {
     super(props);
 
-    this.changeColor = this.changeColor.bind(this);
     this.state = {
       style: "Normal"
     }
-  }
-
-  changeColor(event) {    
-    this.setState({ style: window.$clickState })
   }
 
   render() {
