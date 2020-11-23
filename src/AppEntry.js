@@ -3,13 +3,19 @@ import Waypoint from './Waypoint.js';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { NodeType,SetNodes } from './Utils';
+import { NodeType } from './Utils';
+import { ThemeConsumer } from 'react-bootstrap/esm/ThemeProvider';
+
+const requestOptions = {
+    method: 'POST',
+};
 
 class AppEntry extends React.Component {
 
     constructor(props) {
         super(props);
 
+        this.SetNodeStatus = this.SetNodeStatus.bind(this);
         this.ChangeActionType = this.ChangeActionType.bind(this);
         this.BeginPathfinder = this.BeginPathfinder.bind(this);
         this.NodeStateChange = this.NodeStateChange.bind(this);
@@ -17,24 +23,42 @@ class AppEntry extends React.Component {
         this.DistanceBetweenId = this.DistanceBetweenId.bind(this);
         this.PathfinderLoop = this.PathfinderLoop.bind(this);
         this.GetId = this.GetId.bind(this);
+        this.InitialiseStartingData = this.InitialiseStartingData.bind(this);
 
         this.xWidth = 10;
         this.yWidth = 10;
 
         this.painterState = NodeType.Normal;
-        this.nodeStatus = Array(this.xWidth * this.yWidth).fill(NodeType.Normal);
         this.startNode = -1;
         this.endNode = -1;
+
+        this.InitialiseStartingData();
+
+        this.intervalId = 0;
+
+        this.state = {
+            nodeStatus: Array(this.xWidth * this.yWidth).fill(NodeType.Normal)
+        }
+    }
+
+    SetNodeStatus(id, state) {
+        const editNs = this.state.nodeStatus.slice();
+        editNs[id] = state;
+        this.setState({ nodeStatus: editNs });
+    }
+
+    InitialiseStartingData() {
+
+        if (this.explored != null)
+            for (var i = 0; i < this.explored.length; i++){
+                console.log(this.explored[i]);
+                this.SetNodeStatus(this.explored[i], NodeType.Normal);
+            }
 
         this.currentNode = 0;
         this.unvisited = [];
         this.explored = [];
         this.cost = Array(this.xWidth * this.yWidth).fill([-1, 0]);
-        this.intervalId = 0;
-
-        this.state = {
-            iteration: 0
-        }
     }
 
     GetCoordinates(id) {
@@ -55,27 +79,31 @@ class AppEntry extends React.Component {
         this.painterState = evt;
     }
 
+    SetNodeToNormal(nodeId) {
+        if (nodeId < 0)
+            return;
+
+        this.SetNodeStatus(nodeId, NodeType.Normal);
+        fetch('https://localhost:44391/RemoveNode?nodeId=' + nodeId, requestOptions).then(response => response.json()).then(data => console.log(data));
+    }
+
     NodeStateChange(nodeid) {
 
         // Unsets previous SP/EP
         if (this.painterState == NodeType.Startpoint) {
-            if (this.startNode > -1)
-                this.nodeStatus[this.startNode] = NodeType.Normal;
-
+            this.SetNodeToNormal(this.startNode);
             this.startNode = nodeid;
         }
 
         if (this.painterState == NodeType.Endpoint) {
-            if (this.endNode > -1)
-                this.nodeStatus[this.endNode] = NodeType.Normal;
-
+            this.SetNodeToNormal(this.endNode);
             this.endNode = nodeid;
         }
 
-        this.nodeStatus[nodeid] = this.painterState;
+        this.SetNodeStatus(nodeid, this.painterState);
 
-        SetNodes(nodeid,this.painterState);
-        this.setState({ iteration: this.state.iteration++ });
+        fetch('https://localhost:44391/SetNode?nodeId=' + nodeid + "&nodeState=" + this.painterState, requestOptions).then(response => response.json()).then(data => console.log(data));
+        //this.setState({ iteration: this.state.iteration++ });
     }
 
     DistanceBetweenId(id0, id1) {
@@ -85,13 +113,13 @@ class AppEntry extends React.Component {
         let x = Math.abs(coord1[0] - coord0[0]);
         let y = Math.abs(coord1[1] - coord0[1]);
 
-        return (x*x) + (y*y);
+        return (x * x) + (y * y);
     }
 
     PathfinderLoop() {
 
-        if (this.nodeStatus[this.currentNode] != NodeType.Startpoint && this.nodeStatus[this.currentNode] != NodeType.Endpoint)
-            this.nodeStatus[this.currentNode] = NodeType.Visited;
+        if (this.state.nodeStatus[this.currentNode] != NodeType.Startpoint && this.state.nodeStatus[this.currentNode] != NodeType.Endpoint)
+            this.state.nodeStatus[this.currentNode] = NodeType.Visited;
 
         let nodeCoords = this.GetCoordinates(this.currentNode);
         let directions = [[-1, 0], [0, 1], [1, 0], [0, -1]];
@@ -102,14 +130,14 @@ class AppEntry extends React.Component {
             if (id < 0)
                 continue;
 
-            if (this.nodeStatus[id] != NodeType.Obstacle && (this.cost[id][0] > this.cost[this.currentNode][0] + 1 || this.cost[id][0] < 0 || !this.explored.includes(id))) {
+            if (this.state.nodeStatus[id] != NodeType.Obstacle && (this.cost[id][0] > this.cost[this.currentNode][0] + 1 || this.cost[id][0] < 0 || !this.explored.includes(id))) {
                 this.unvisited.push(id);
                 this.explored.push(id);
                 this.cost[id] = [this.cost[this.currentNode][0] + 1, this.DistanceBetweenId(id, this.endNode)];
 
 
-                if (this.nodeStatus[id] != NodeType.Startpoint && this.nodeStatus[id] != NodeType.Endpoint)
-                    this.nodeStatus[id] = NodeType.Unvisited;
+                if (this.state.nodeStatus[id] != NodeType.Startpoint && this.state.nodeStatus[id] != NodeType.Endpoint)
+                    this.state.nodeStatus[id] = NodeType.Unvisited;
             }
         }
 
@@ -145,13 +173,34 @@ class AppEntry extends React.Component {
         this.intervalId = setInterval(this.PathfinderLoop, 50);
     }
 
+    componentDidMount() {
+        fetch('https://localhost:44391/RetrieveAllNodes', requestOptions).then(response => response.json()).then(data => {
+            var nodesData = JSON.parse(data);
+
+            for (var i = 0; i < nodesData.length; i++) {
+                switch (nodesData[i].NODE_TYPE) {
+                    case NodeType.Startpoint:
+                        this.startNode = nodesData[i].NODE_ID;
+                        break;
+                    case NodeType.Endpoint:
+                        this.endNode = nodesData[i].NODE_ID;
+                        break;
+
+                }
+                this.SetNodeStatus(nodesData[i].NODE_ID, nodesData[i].NODE_TYPE);
+            }
+
+            this.setState({ iteration: this.state.iteration++ });
+        });
+    }
+
     render() {
         let nodes = [];
 
         for (var i = 0; i < this.yWidth; i++) {
             for (var j = 0; j < this.xWidth; j++) {
                 var id = this.GetId(j, i);
-                nodes.push(<Waypoint callback={this.NodeStateChange} id={id} style={this.nodeStatus[id]} />);
+                nodes.push(<Waypoint callback={this.NodeStateChange} id={id} style={this.state.nodeStatus[id]} />);
             }
 
             nodes.push(<br></br>);
@@ -168,7 +217,12 @@ class AppEntry extends React.Component {
 
                 <button onClick={this.BeginPathfinder}>
                     Visualize Pathfinder
-            </button><br></br>
+                </button><br></br>
+
+                <button onClick={this.InitialiseStartingData}>
+                    Clear Path Nodes
+                </button><br></br>
+
 
                 {nodes}
             </div>
