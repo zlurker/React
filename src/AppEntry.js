@@ -3,12 +3,21 @@ import Waypoint from './Waypoint.js';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { NodeType } from './Utils';
 import { ThemeConsumer } from 'react-bootstrap/esm/ThemeProvider';
 
 const requestOptions = {
     method: 'POST',
 };
+
+const NodeType = {
+    Normal: "Normal",
+    Obstacle: "Obstacle",
+    Startpoint: "Startpoint",
+    Endpoint: "Endpoint",
+    Unvisited: "Unvisited",
+    Visited: "Visited"
+  }
+  
 
 class AppEntry extends React.Component {
 
@@ -103,7 +112,6 @@ class AppEntry extends React.Component {
         this.SetNodeStatus([nodeid], this.painterState);
 
         fetch('https://localhost:44391/SetNode?nodeId=' + nodeid + "&nodeState=" + this.painterState, requestOptions).then(response => response.json()).then(data => console.log(data));
-        //this.setState({ iteration: this.state.iteration++ });
     }
 
     DistanceBetweenId(id0, id1) {
