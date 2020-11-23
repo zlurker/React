@@ -3,7 +3,7 @@ import Waypoint from './Waypoint.js';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ThemeConsumer } from 'react-bootstrap/esm/ThemeProvider';
+import InputForm from './InputForm';
 
 const requestOptions = {
     method: 'POST',
@@ -261,7 +261,7 @@ class AppEntry extends React.Component {
                 <input type="text" value={this.settings['Y']} />
                 <br></br>
 
-                <input type="text" onChange={(e) => this.ModifySettings("INTERVAL",parseInt(e.target.value))} />
+                <input type="text" value={this.settings['INTERVAL']} onChange={(e) => this.ModifySettings("INTERVAL",parseInt(e.target.value))} />
                 <br></br>
 
                 <button onClick={this.BeginPathfinder}>
