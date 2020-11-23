@@ -53,12 +53,12 @@ class AppEntry extends React.Component {
         }
     }
 
-    HandleXWidth(){
+    HandleXWidth() {
 
     }
 
     ClearAllNodeData() {
-        this.InitialiseNodeStatus();   
+        this.InitialiseNodeStatus();
         this.setState({ triggerRender: this.state.triggerRender++ });
 
         fetch('https://localhost:44391/RemoveAllNodes', requestOptions).then(response => response.json()).then(data => console.log(data));
@@ -216,13 +216,32 @@ class AppEntry extends React.Component {
             }
         });
 
-        fetch('https://localhost:44391/RetrieveSettings', requestOptions).then(response => response.json()).then(data => {
+        fetch('https://localhost:44391/RetrieveAllSettings', requestOptions).then(response => response.json()).then(data => {
             var settingsData = JSON.parse(data);
+
+            var xVal; 
+            var yVal;
+            var intervalVal;
+
+            for (var i = 0; i < settingsData.length; i++) {
+                switch (settingsData[i].SETTING_NAME) {
+                    case 'X':
+                        xVal=settingsData[i].SETTING_VALUE;
+                        break;
+                    case 'Y':
+                        yVal=settingsData[i].SETTING_VALUE;
+                        break;
+                    case 'INTERVAL':
+                        intervalVal=settingsData[i].SETTING_VALUE;
+                        break;
+                }
+            }
+
             this.setState({
-                x:settingsData.X,
-                y:settingsData.Y,
-                interval:settingsData.INTERVAL
-            });           
+                x:xVal,
+                y:yVal,
+                interval:intervalVal
+            });
         });
     }
 
@@ -247,14 +266,14 @@ class AppEntry extends React.Component {
                     <Dropdown.Item eventKey={NodeType.Obstacle}>Obstacle</Dropdown.Item>
                 </DropdownButton>
 
-                <input type ="text" value={this.state.x} />
-                <input type ="text" value={this.state.y} />
+                <input type="text" value={this.state.x} />
+                <input type="text" value={this.state.y} />
                 <br></br>
 
-                <input type ="text" value={this.state.interval}/>
+                <input type="text" value={this.state.interval} />
                 <br></br>
 
-                <button  onClick={this.BeginPathfinder}>
+                <button onClick={this.BeginPathfinder}>
                     Visualize Pathfinder
                 </button>
                 <br></br>
