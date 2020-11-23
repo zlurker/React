@@ -25,6 +25,7 @@ class AppEntry extends React.Component {
         super(props);
 
         this.ClearAllNodeData = this.ClearAllNodeData.bind(this);
+        this.ModifySettings = this.ModifySettings.bind(this);
         this.InitialiseNodeStatus = this.InitialiseNodeStatus.bind(this);
         this.SetNodeStatus = this.SetNodeStatus.bind(this);
         this.ChangeActionType = this.ChangeActionType.bind(this);
@@ -44,19 +45,21 @@ class AppEntry extends React.Component {
         this.startNode = -1;
         this.endNode = -1;
 
+        this.state = {
+            triggerRender: 0
+        }
+
         this.InitialiseNodeStatus();
         this.InitialiseStartingData();
 
         this.intervalId = 0;
 
-        this.state = {
-            triggerRender: 0
-        }
+        
     }
 
     ClearAllNodeData() {
         this.InitialiseNodeStatus();
-        this.setState({ triggerRender: this.state.triggerRender++ });
+        this.setState({ triggerRender: 0 });
 
         fetch('https://localhost:44391/RemoveAllNodes', requestOptions).then(response => response.json()).then(data => console.log(data));
     }
@@ -67,12 +70,12 @@ class AppEntry extends React.Component {
 
     SetNodeStatus(id, state) {
         this.nodeStatus[id] = state;
-        this.setState({ triggerRender: this.state.triggerRender++ });
+        this.setState({ triggerRender: 0 });
     }
 
     ModifySettings(name, val){
-        
-        this.setState({ triggerRender: this.state.triggerRender++ });
+        this.settings[name] = val;
+        this.setState({ triggerRender: 0 });
     }
 
     InitialiseStartingData() {
@@ -143,6 +146,7 @@ class AppEntry extends React.Component {
     }
 
     PathfinderLoop() {
+        console.log("Loop");
 
         if (this.nodeStatus[this.currentNode] != NodeType.Startpoint && this.nodeStatus[this.currentNode] != NodeType.Endpoint)
             this.nodeStatus[this.currentNode] = NodeType.Visited;
@@ -188,7 +192,7 @@ class AppEntry extends React.Component {
         } else
             clearInterval(this.intervalId);
 
-        this.setState({ iteration: this.state.iteration++ });
+        this.setState({ triggerRender: 0 });
     }
 
     BeginPathfinder() {
@@ -196,10 +200,21 @@ class AppEntry extends React.Component {
         this.unvisited = [];
         this.cost[this.currentNode] = [0, this.DistanceBetweenId(this.currentNode, this.endNode)];
         this.explored = [this.startNode];
-        this.intervalId = setInterval(this.PathfinderLoop, 50);
+        this.intervalId = setInterval(this.PathfinderLoop, this.settings["INTERVAL"]);
     }
 
     componentDidMount() {
+
+        fetch('https://localhost:44391/RetrieveAllSettings', requestOptions).then(response => response.json()).then(data => {
+            var settingsData = JSON.parse(data);
+
+            for (var i = 0; i < settingsData.length; i++) 
+                this.settings[settingsData[i].SETTING_NAME] = settingsData[i].SETTING_VALUE;
+
+            console.log("Settings: " + this.settings);
+            //this.setState({ iteration: this.state.iteration+1 });
+        });
+
         fetch('https://localhost:44391/RetrieveAllNodes', requestOptions).then(response => response.json()).then(data => {
             var nodesData = JSON.parse(data);
 
@@ -218,14 +233,7 @@ class AppEntry extends React.Component {
             }
         });
 
-        fetch('https://localhost:44391/RetrieveAllSettings', requestOptions).then(response => response.json()).then(data => {
-            var settingsData = JSON.parse(data);
-
-            for (var i = 0; i < settingsData.length; i++) 
-                this.settings[settingsData[i].SETTING_NAME] = settingsData[i].SETTING_VALUE;
-
-            this.setState({ triggerRender: this.state.triggerRender++ });
-        });
+        
     }
 
     render() {
@@ -253,7 +261,7 @@ class AppEntry extends React.Component {
                 <input type="text" value={this.settings['Y']} />
                 <br></br>
 
-                <input type="text" value={this.settings['INTERVAL']} />
+                <input type="text" onChange={(e) => this.ModifySettings("INTERVAL",parseInt(e.target.value))} />
                 <br></br>
 
                 <button onClick={this.BeginPathfinder}>
