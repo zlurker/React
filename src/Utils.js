@@ -22,7 +22,7 @@ function SetNodes(id, nodetype) {
     method: 'POST',
   };
 
-  fetch('https://localhost:44391/SetNode?nodeId=' + id + "&nodeState=" + nodetype, requestOptions).then(response => console.log(response)).catch(error=>console.log(error));
+  fetch('https://localhost:44391/SetNode?nodeId=' + id + "&nodeState=" + nodetype, requestOptions).then(response => response.json()).then(data=> console.log(data));
 }
 
 
