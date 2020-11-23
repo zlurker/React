@@ -40,6 +40,7 @@ class AppEntry extends React.Component {
         this.yWidth = 10;
 
         this.painterState = NodeType.Normal;
+        this.settings = {};
         this.startNode = -1;
         this.endNode = -1;
 
@@ -51,10 +52,6 @@ class AppEntry extends React.Component {
         this.state = {
             triggerRender: 0
         }
-    }
-
-    HandleXWidth() {
-
     }
 
     ClearAllNodeData() {
@@ -70,6 +67,11 @@ class AppEntry extends React.Component {
 
     SetNodeStatus(id, state) {
         this.nodeStatus[id] = state;
+        this.setState({ triggerRender: this.state.triggerRender++ });
+    }
+
+    ModifySettings(name, val){
+        
         this.setState({ triggerRender: this.state.triggerRender++ });
     }
 
@@ -219,29 +221,10 @@ class AppEntry extends React.Component {
         fetch('https://localhost:44391/RetrieveAllSettings', requestOptions).then(response => response.json()).then(data => {
             var settingsData = JSON.parse(data);
 
-            var xVal; 
-            var yVal;
-            var intervalVal;
+            for (var i = 0; i < settingsData.length; i++) 
+                this.settings[settingsData[i].SETTING_NAME] = settingsData[i].SETTING_VALUE;
 
-            for (var i = 0; i < settingsData.length; i++) {
-                switch (settingsData[i].SETTING_NAME) {
-                    case 'X':
-                        xVal=settingsData[i].SETTING_VALUE;
-                        break;
-                    case 'Y':
-                        yVal=settingsData[i].SETTING_VALUE;
-                        break;
-                    case 'INTERVAL':
-                        intervalVal=settingsData[i].SETTING_VALUE;
-                        break;
-                }
-            }
-
-            this.setState({
-                x:xVal,
-                y:yVal,
-                interval:intervalVal
-            });
+            this.setState({ triggerRender: this.state.triggerRender++ });
         });
     }
 
@@ -266,11 +249,11 @@ class AppEntry extends React.Component {
                     <Dropdown.Item eventKey={NodeType.Obstacle}>Obstacle</Dropdown.Item>
                 </DropdownButton>
 
-                <input type="text" value={this.state.x} />
-                <input type="text" value={this.state.y} />
+                <input type="text" value={this.settings['X']} />
+                <input type="text" value={this.settings['Y']} />
                 <br></br>
 
-                <input type="text" value={this.state.interval} />
+                <input type="text" value={this.settings['INTERVAL']} />
                 <br></br>
 
                 <button onClick={this.BeginPathfinder}>
