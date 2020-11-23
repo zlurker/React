@@ -16,14 +16,16 @@ const NodeType = {
     Endpoint: "Endpoint",
     Unvisited: "Unvisited",
     Visited: "Visited"
-  }
-  
+}
+
 
 class AppEntry extends React.Component {
 
     constructor(props) {
         super(props);
 
+        this.ClearAllNodeData = this.ClearAllNodeData.bind(this);
+        this.InitialiseNodeStatus = this.InitialiseNodeStatus.bind(this);
         this.SetNodeStatus = this.SetNodeStatus.bind(this);
         this.ChangeActionType = this.ChangeActionType.bind(this);
         this.BeginPathfinder = this.BeginPathfinder.bind(this);
@@ -40,8 +42,8 @@ class AppEntry extends React.Component {
         this.painterState = NodeType.Normal;
         this.startNode = -1;
         this.endNode = -1;
-        this.nodeStatus = Array(this.xWidth * this.yWidth).fill(NodeType.Normal);
 
+        this.InitialiseNodeStatus();
         this.InitialiseStartingData();
 
         this.intervalId = 0;
@@ -51,6 +53,17 @@ class AppEntry extends React.Component {
         }
     }
 
+    ClearAllNodeData() {
+        this.InitialiseNodeStatus();   
+        this.setState({ triggerRender: this.state.triggerRender++ });
+
+        fetch('https://localhost:44391/RemoveAllNodes', requestOptions).then(response => response.json()).then(data => console.log(data));
+    }
+
+    InitialiseNodeStatus() {
+        this.nodeStatus = Array(this.xWidth * this.yWidth).fill(NodeType.Normal);
+    }
+
     SetNodeStatus(id, state) {
         this.nodeStatus[id] = state;
         this.setState({ triggerRender: this.state.triggerRender++ });
@@ -58,11 +71,11 @@ class AppEntry extends React.Component {
 
     InitialiseStartingData() {
 
-        if (this.explored != null) 
+        if (this.explored != null)
             for (var i = 0; i < this.explored.length; i++)
                 if (this.nodeStatus[this.explored[i]] == NodeType.Unvisited || this.nodeStatus[this.explored[i]] == NodeType.Visited)
                     this.SetNodeStatus([this.explored[i]], NodeType.Normal);
-        
+
 
         this.currentNode = 0;
         this.unvisited = [];
@@ -231,6 +244,10 @@ class AppEntry extends React.Component {
 
                 <button onClick={this.InitialiseStartingData}>
                     Clear Path Nodes
+                </button><br></br>
+
+                <button onClick={this.ClearAllNodeData}>
+                    Clear All Data
                 </button><br></br>
 
 
