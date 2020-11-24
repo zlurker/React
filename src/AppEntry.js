@@ -36,9 +36,10 @@ class AppEntry extends React.Component {
         this.PathfinderLoop = this.PathfinderLoop.bind(this);
         this.GetId = this.GetId.bind(this);
         this.InitialiseStartingData = this.InitialiseStartingData.bind(this);
+        this.ModifyUnsavedSettings = this.ModifyUnsavedSettings.bind(this);
+        this.SaveUnsavedSettings = this.SaveUnsavedSettings.bind(this);
 
-        this.xWidth = 10;
-        this.yWidth = 10;
+        this.tempSettings = {};
 
         this.painterState = NodeType.Normal;
         this.settings = {};
@@ -61,6 +62,7 @@ class AppEntry extends React.Component {
     }
 
     InitialiseNodeStatus() {
+        console.log("Initialising map for " + this.settings['X'] + " " + this.settings['Y']);
         this.nodeStatus = Array(this.settings['X'] * this.settings['Y']).fill(NodeType.Normal);
     }
 
@@ -79,8 +81,15 @@ class AppEntry extends React.Component {
         fetch('https://localhost:44391/ModifySettings?settingName=' + name + "&value=" + val, requestOptions).then(response => response.json()).then(data => console.log(data));
     }
 
-    ModifyUnsavedSettings() {
+    ModifyUnsavedSettings(name, val) {
+        this.tempSettings[name] = val;
+    }
 
+    SaveUnsavedSettings() {
+        for (let entry in this.tempSettings)
+            this.ModifySettings(entry, this.tempSettings[entry]);
+
+        this.ClearAllNodeData();
     }
 
     InitialiseStartingData() {
@@ -104,7 +113,9 @@ class AppEntry extends React.Component {
     }
 
     GetId(x, y) {
-        if (x < 0 || x >= this.settings['X']|| y < 0 || y >= this.settings['Y'])
+        console.log(x + " " +y);
+
+        if (x < 0 || x >= this.settings['X'] || y < 0 || y >= this.settings['Y'])
             return -1;
 
         return (y * this.settings['Y']) + x;
@@ -218,7 +229,7 @@ class AppEntry extends React.Component {
 
             this.InitialiseNodeStatus();
             this.InitialiseStartingData();
-            console.log("Settings: " + this.settings);
+
             this.settingsLoaded = true;
             this.setState({ triggerRender: this.state.triggerRender++ });
 
@@ -254,7 +265,9 @@ class AppEntry extends React.Component {
         if (this.settingsLoaded) {
             for (var i = 0; i < this.settings['X']; i++) {
                 for (var j = 0; j < this.settings['Y']; j++) {
-                    var id = this.GetId(j, i);
+                    var id = this.GetId(i, j);
+                    console.log(this.nodeStatus[id] + " " + id);
+                    
                     nodes.push(<Waypoint callback={this.NodeStateChange} id={id} style={this.nodeStatus[id]} />);
                 }
 
@@ -275,7 +288,9 @@ class AppEntry extends React.Component {
                     <Dropdown.Item eventKey={NodeType.Obstacle}>Obstacle</Dropdown.Item>
                 </DropdownButton>
 
-
+                <NumericField startVal={x} settingName={'X'} callback={this.ModifyUnsavedSettings} />
+                <NumericField startVal={y} settingName={'Y'} callback={this.ModifyUnsavedSettings} />
+                <button onClick={this.SaveUnsavedSettings}>Set WH</button>
                 <br></br>
                 <NumericField startVal={interval} settingName={'INTERVAL'} callback={this.ModifySettings} />
                 <br></br>
