@@ -50,10 +50,7 @@ class AppEntry extends React.Component {
             triggerRender: 0
         }
 
-        this.InitialiseNodeStatus();
-        this.InitialiseStartingData();
-
-        this.intervalId = 0;    
+        this.intervalId = 0;
     }
 
     ClearAllNodeData() {
@@ -64,7 +61,7 @@ class AppEntry extends React.Component {
     }
 
     InitialiseNodeStatus() {
-        this.nodeStatus = Array(this.xWidth * this.yWidth).fill(NodeType.Normal);
+        this.nodeStatus = Array(this.settings['X'] * this.settings['Y']).fill(NodeType.Normal);
     }
 
     SetNodeStatus(id, state) {
@@ -72,7 +69,7 @@ class AppEntry extends React.Component {
         this.setState({ triggerRender: 0 });
     }
 
-    ModifySettings(name, val){
+    ModifySettings(name, val) {
         if (isNaN(val))
             return;
 
@@ -82,7 +79,7 @@ class AppEntry extends React.Component {
         fetch('https://localhost:44391/ModifySettings?settingName=' + name + "&value=" + val, requestOptions).then(response => response.json()).then(data => console.log(data));
     }
 
-    ModifyUnsavedSettings(){
+    ModifyUnsavedSettings() {
 
     }
 
@@ -96,21 +93,21 @@ class AppEntry extends React.Component {
         this.currentNode = 0;
         this.unvisited = [];
         this.explored = [];
-        this.cost = Array(this.xWidth * this.yWidth).fill([-1, 0]);
+        this.cost = Array(this.settings['X'] * this.settings['Y']).fill([-1, 0]);
     }
 
     GetCoordinates(id) {
-        var x = id % this.yWidth;
-        var y = (id - x) / this.yWidth;
+        var x = id % this.settings['Y'];
+        var y = (id - x) / this.settings['Y'];
 
         return [x, y];
     }
 
     GetId(x, y) {
-        if (x < 0 || x >= this.xWidth || y < 0 || y >= this.yWidth)
+        if (x < 0 || x >= this.settings['X']|| y < 0 || y >= this.settings['Y'])
             return -1;
 
-        return (y * this.yWidth) + x;
+        return (y * this.settings['Y']) + x;
     }
 
     ChangeActionType(evt) {
@@ -216,51 +213,54 @@ class AppEntry extends React.Component {
         fetch('https://localhost:44391/RetrieveAllSettings', requestOptions).then(response => response.json()).then(data => {
             var settingsData = JSON.parse(data);
 
-            for (var i = 0; i < settingsData.length; i++) 
+            for (var i = 0; i < settingsData.length; i++)
                 this.settings[settingsData[i].SETTING_NAME] = settingsData[i].SETTING_VALUE;
 
+            this.InitialiseNodeStatus();
+            this.InitialiseStartingData();
             console.log("Settings: " + this.settings);
             this.settingsLoaded = true;
-            this.setState({ triggerRender:this.state.triggerRender++ });
+            this.setState({ triggerRender: this.state.triggerRender++ });
+
+            fetch('https://localhost:44391/RetrieveAllNodes', requestOptions).then(response => response.json()).then(data => {
+                var nodesData = JSON.parse(data);
+
+                for (var i = 0; i < nodesData.length; i++) {
+                    switch (nodesData[i].NODE_TYPE) {
+                        case NodeType.Startpoint:
+                            this.startNode = nodesData[i].NODE_ID;
+                            break;
+                        case NodeType.Endpoint:
+                            this.endNode = nodesData[i].NODE_ID;
+                            break;
+
+                    }
+
+                    this.SetNodeStatus([nodesData[i].NODE_ID], nodesData[i].NODE_TYPE);
+                }
+            });
         });
 
-        fetch('https://localhost:44391/RetrieveAllNodes', requestOptions).then(response => response.json()).then(data => {
-            var nodesData = JSON.parse(data);
 
-            for (var i = 0; i < nodesData.length; i++) {
-                switch (nodesData[i].NODE_TYPE) {
-                    case NodeType.Startpoint:
-                        this.startNode = nodesData[i].NODE_ID;
-                        break;
-                    case NodeType.Endpoint:
-                        this.endNode = nodesData[i].NODE_ID;
-                        break;
-
-                }
-
-                this.SetNodeStatus([nodesData[i].NODE_ID], nodesData[i].NODE_TYPE);
-            }
-        });       
     }
 
     render() {
         let nodes = [];
 
+        var interval = '';
+        var x = '';
+        var y = '';
 
-        for (var i = 0; i < this.yWidth; i++) {
-            for (var j = 0; j < this.xWidth; j++) {
-                var id = this.GetId(j, i);
-                nodes.push(<Waypoint callback={this.NodeStateChange} id={id} style={this.nodeStatus[id]} />);
+        if (this.settingsLoaded) {
+            for (var i = 0; i < this.settings['X']; i++) {
+                for (var j = 0; j < this.settings['Y']; j++) {
+                    var id = this.GetId(j, i);
+                    nodes.push(<Waypoint callback={this.NodeStateChange} id={id} style={this.nodeStatus[id]} />);
+                }
+
+                nodes.push(<br></br>);
             }
 
-            nodes.push(<br></br>);
-        }
-
-        var interval ='';
-        var x = '';
-        var y ='';
-
-        if (this.settingsLoaded){
             interval = this.settings['INTERVAL'].toString();
             x = this.settings['X'].toString();
             y = this.settings['Y'].toString();
@@ -274,8 +274,8 @@ class AppEntry extends React.Component {
                     <Dropdown.Item eventKey={NodeType.Startpoint}>Startpoint</Dropdown.Item>
                     <Dropdown.Item eventKey={NodeType.Obstacle}>Obstacle</Dropdown.Item>
                 </DropdownButton>
-    
-                
+
+
                 <br></br>
                 <NumericField startVal={interval} settingName={'INTERVAL'} callback={this.ModifySettings} />
                 <br></br>
