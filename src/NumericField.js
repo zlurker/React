@@ -18,7 +18,7 @@ class NumericField extends React.Component {
         if (isNaN(evt.target.value))
             return;
 
-        this.props.callback(this.props.settingName,parseInt(evt.target.value));
+        this.props.callback(this.props.settingName, parseInt(evt.target.value));
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -27,8 +27,18 @@ class NumericField extends React.Component {
     }
 
     render() {
+        let textbox;
+
+        if (this.props.enabled)
+            textbox = <input type="text" value={this.state.textVal} onChange={this.ValueChange}  />;
+        else
+            textbox = <input type="text" value={this.state.textVal} onChange={this.ValueChange} disabled/>;
+
         return (
-            <input type="text" value={this.state.textVal} onChange={this.ValueChange} />
+            <div className="test">
+                {textbox}
+            </div>
+
         )
     }
 }

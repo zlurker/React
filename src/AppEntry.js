@@ -46,6 +46,7 @@ class AppEntry extends React.Component {
         this.startNode = -1;
         this.endNode = -1;
         this.settingsLoaded = false;
+        this.enableUI = true;
 
         this.state = {
             triggerRender: 0
@@ -114,7 +115,7 @@ class AppEntry extends React.Component {
 
     GetId(x, y) {
 
-        console.log(this.settings['X'] + " " +  this.settings['Y']);
+        console.log(this.settings['X'] + " " + this.settings['Y']);
         if (x < 0 || x >= this.settings['X'] || y < 0 || y >= this.settings['Y'])
             return -1;
 
@@ -162,13 +163,13 @@ class AppEntry extends React.Component {
     }
 
     PathfinderLoop() {
-        console.log("Loop");
 
         if (this.nodeStatus[this.currentNode] != NodeType.Startpoint && this.nodeStatus[this.currentNode] != NodeType.Endpoint)
             this.nodeStatus[this.currentNode] = NodeType.Visited;
 
         let nodeCoords = this.GetCoordinates(this.currentNode);
         let directions = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+        let completed = false;
 
         for (let i = 0; i < directions.length; i++) {
             let id = this.GetId(nodeCoords[0] + directions[i][0], nodeCoords[1] + directions[i][1]);
@@ -204,19 +205,27 @@ class AppEntry extends React.Component {
             this.unvisited.splice(shortestIndex, 1);
 
             if (this.currentNode == this.endNode)
-                clearInterval(this.intervalId);
+                completed = true;
         } else
+            completed = true;
+
+        if (completed) {
             clearInterval(this.intervalId);
+            this.enableUI = true;
+        }
 
         this.setState({ triggerRender: 0 });
     }
 
     BeginPathfinder() {
+        this.InitialiseStartingData();
+        
         this.currentNode = this.startNode;
         this.unvisited = [];
         this.cost[this.currentNode] = [0, this.DistanceBetweenId(this.currentNode, this.endNode)];
         this.explored = [this.startNode];
         this.intervalId = setInterval(this.PathfinderLoop, this.settings["INTERVAL"]);
+        this.enableUI = false;
     }
 
     componentDidMount() {
@@ -262,12 +271,38 @@ class AppEntry extends React.Component {
         var x = '';
         var y = '';
 
+        if (this.enableUI) {
+            nodes.push(<button onClick={this.SaveUnsavedSettings}>Set WH</button>);
+            nodes.push(<br></br>);
+
+            nodes.push(<button onClick={this.BeginPathfinder}>Visualize Pathfinder </button>);
+            nodes.push(<br></br>);
+
+            nodes.push(<button onClick={this.InitialiseStartingData}>Clear Path Nodes</button>);
+            nodes.push(<br></br>);
+
+            nodes.push( <button onClick={this.ClearAllNodeData}>Clear All Data</button>);
+            nodes.push(<br></br>);
+        }else{
+            nodes.push(<button onClick={this.SaveUnsavedSettings} disabled>Set WH</button>);
+            nodes.push(<br></br>);
+
+            nodes.push(<button onClick={this.BeginPathfinder} disabled>Visualize Pathfinder</button>);
+            nodes.push(<br></br>);
+
+            nodes.push(<button onClick={this.InitialiseStartingData} disabled>Clear Path Nodes</button>);
+            nodes.push(<br></br>);
+
+            nodes.push( <button onClick={this.ClearAllNodeData} disabled>Clear All Data</button>);
+            nodes.push(<br></br>);
+        }
+
         if (this.settingsLoaded) {
             for (var i = 0; i < this.settings['Y']; i++) {
                 for (var j = 0; j < this.settings['X']; j++) {
                     var id = this.GetId(j, i);
                     console.log(i + " " + j + " " + this.nodeStatus[id] + " " + id);
-                    
+
                     nodes.push(<Waypoint callback={this.NodeStateChange} id={id} style={this.nodeStatus[id]} />);
                 }
 
@@ -288,27 +323,16 @@ class AppEntry extends React.Component {
                     <Dropdown.Item eventKey={NodeType.Obstacle}>Obstacle</Dropdown.Item>
                 </DropdownButton>
 
-                <NumericField startVal={x} settingName={'X'} callback={this.ModifyUnsavedSettings} />
-                <NumericField startVal={y} settingName={'Y'} callback={this.ModifyUnsavedSettings} />
-                <button onClick={this.SaveUnsavedSettings}>Set WH</button>
-                <br></br>
-                <NumericField startVal={interval} settingName={'INTERVAL'} callback={this.ModifySettings} />
-                <br></br>
-
-                <button onClick={this.BeginPathfinder}>
-                    Visualize Pathfinder
-                </button>
+                <h6>Width and Height</h6>
+                <NumericField startVal={x} settingName={'X'} callback={this.ModifyUnsavedSettings} enabled={this.enableUI} />
+                <NumericField startVal={y} settingName={'Y'} callback={this.ModifyUnsavedSettings} enabled={this.enableUI} />
+                
+                <h6>MS per turn</h6>
+                <NumericField startVal={interval} settingName={'INTERVAL'} callback={this.ModifySettings} enabled={this.enableUI} />
                 <br></br>
 
-                <button onClick={this.InitialiseStartingData}>
-                    Clear Path Nodes
-                </button>
-                <br></br>
 
-                <button onClick={this.ClearAllNodeData}>
-                    Clear All Data
-                </button>
-                <br></br>
+               
 
                 {nodes}
             </div>
