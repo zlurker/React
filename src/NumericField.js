@@ -16,9 +16,13 @@ class NumericField extends React.Component{
         this.setState({textVal:evt.target.value});
     }
 
-    render(){
-        console.log(this.state.textVal);
+    componentDidUpdate(prevProps,prevState){
+        if (prevProps.startVal !== this.props.startVal)
+            this.setState({textVal:this.props.startVal});
+        
+    }
 
+    render(){
         return (
             <input type="text" value={this.state.textVal} onChange={this.ValueChange} />
         )

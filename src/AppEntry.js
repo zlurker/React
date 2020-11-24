@@ -243,6 +243,7 @@ class AppEntry extends React.Component {
     render() {
         let nodes = [];
 
+
         for (var i = 0; i < this.yWidth; i++) {
             for (var j = 0; j < this.xWidth; j++) {
                 var id = this.GetId(j, i);
@@ -251,6 +252,11 @@ class AppEntry extends React.Component {
 
             nodes.push(<br></br>);
         }
+
+        var interval ='';
+
+        if (this.settings.hasOwnProperty('INTERVAL'))
+            interval =this.settings['INTERVAL'].toString();
 
         return (
             <div className="App">
@@ -261,12 +267,10 @@ class AppEntry extends React.Component {
                     <Dropdown.Item eventKey={NodeType.Obstacle}>Obstacle</Dropdown.Item>
                 </DropdownButton>
 
-                <input type="text" value={this.settings['X']} />
-                <input type="text" value={this.settings['Y']} />
+                
                 <br></br>
 
-                {console.log("interval:" + this.settings['INTERVAL'])}
-                <NumericField startVal={"50"} />
+                <NumericField startVal={interval} />
                 <br></br>
 
                 <button onClick={this.BeginPathfinder}>
