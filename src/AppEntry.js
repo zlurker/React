@@ -44,6 +44,7 @@ class AppEntry extends React.Component {
         this.settings = {};
         this.startNode = -1;
         this.endNode = -1;
+        this.settingsLoaded = false;
 
         this.state = {
             triggerRender: 0
@@ -52,9 +53,7 @@ class AppEntry extends React.Component {
         this.InitialiseNodeStatus();
         this.InitialiseStartingData();
 
-        this.intervalId = 0;
-
-        
+        this.intervalId = 0;    
     }
 
     ClearAllNodeData() {
@@ -74,12 +73,17 @@ class AppEntry extends React.Component {
     }
 
     ModifySettings(name, val){
-
         if (isNaN(val))
-        return;
+            return;
 
-        this.settings[name] = parseInt(val);
+        this.settings[name] = val;
         this.setState({ triggerRender: 0 });
+
+        fetch('https://localhost:44391/ModifySettings?settingName=' + name + "&value=" + val, requestOptions).then(response => response.json()).then(data => console.log(data));
+    }
+
+    ModifyUnsavedSettings(){
+
     }
 
     InitialiseStartingData() {
@@ -216,7 +220,8 @@ class AppEntry extends React.Component {
                 this.settings[settingsData[i].SETTING_NAME] = settingsData[i].SETTING_VALUE;
 
             console.log("Settings: " + this.settings);
-            this.setState({ triggerRender: this.state.triggerRender+1 });
+            this.settingsLoaded = true;
+            this.setState({ triggerRender:this.state.triggerRender++ });
         });
 
         fetch('https://localhost:44391/RetrieveAllNodes', requestOptions).then(response => response.json()).then(data => {
@@ -235,9 +240,7 @@ class AppEntry extends React.Component {
 
                 this.SetNodeStatus([nodesData[i].NODE_ID], nodesData[i].NODE_TYPE);
             }
-        });
-
-        
+        });       
     }
 
     render() {
@@ -254,9 +257,14 @@ class AppEntry extends React.Component {
         }
 
         var interval ='';
+        var x = '';
+        var y ='';
 
-        if (this.settings.hasOwnProperty('INTERVAL'))
-            interval =this.settings['INTERVAL'].toString();
+        if (this.settingsLoaded){
+            interval = this.settings['INTERVAL'].toString();
+            x = this.settings['X'].toString();
+            y = this.settings['Y'].toString();
+        }
 
         return (
             <div className="App">
@@ -266,11 +274,10 @@ class AppEntry extends React.Component {
                     <Dropdown.Item eventKey={NodeType.Startpoint}>Startpoint</Dropdown.Item>
                     <Dropdown.Item eventKey={NodeType.Obstacle}>Obstacle</Dropdown.Item>
                 </DropdownButton>
-
+    
                 
                 <br></br>
-
-                <NumericField startVal={interval} />
+                <NumericField startVal={interval} settingName={'INTERVAL'} callback={this.ModifySettings} />
                 <br></br>
 
                 <button onClick={this.BeginPathfinder}>

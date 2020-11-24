@@ -1,28 +1,32 @@
 import React from 'react';
 
-class NumericField extends React.Component{
+class NumericField extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.ValueChange = this.ValueChange.bind(this);
 
         this.state = {
-            textVal:props.startVal
+            textVal: props.startVal
         }
     }
 
-    ValueChange(evt){
-        this.setState({textVal:evt.target.value});
+    ValueChange(evt) {
+        this.setState({ textVal: evt.target.value });
+
+        if (isNaN(evt.target.value))
+            return;
+
+        this.props.callback(this.props.settingName,parseInt(evt.target.value));
     }
 
-    componentDidUpdate(prevProps,prevState){
+    componentDidUpdate(prevProps, prevState) {
         if (prevProps.startVal !== this.props.startVal)
-            this.setState({textVal:this.props.startVal});
-        
+            this.setState({ textVal: this.props.startVal });
     }
 
-    render(){
+    render() {
         return (
             <input type="text" value={this.state.textVal} onChange={this.ValueChange} />
         )
