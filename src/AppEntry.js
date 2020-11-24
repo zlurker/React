@@ -106,19 +106,19 @@ class AppEntry extends React.Component {
     }
 
     GetCoordinates(id) {
-        var x = id % this.settings['Y'];
-        var y = (id - x) / this.settings['Y'];
+        var x = id % this.settings['X'];
+        var y = (id - x) / this.settings['X'];
 
         return [x, y];
     }
 
     GetId(x, y) {
-        console.log(x + " " +y);
 
+        console.log(this.settings['X'] + " " +  this.settings['Y']);
         if (x < 0 || x >= this.settings['X'] || y < 0 || y >= this.settings['Y'])
             return -1;
 
-        return (y * this.settings['Y']) + x;
+        return (y * this.settings['X']) + x;
     }
 
     ChangeActionType(evt) {
@@ -263,10 +263,10 @@ class AppEntry extends React.Component {
         var y = '';
 
         if (this.settingsLoaded) {
-            for (var i = 0; i < this.settings['X']; i++) {
-                for (var j = 0; j < this.settings['Y']; j++) {
-                    var id = this.GetId(i, j);
-                    console.log(this.nodeStatus[id] + " " + id);
+            for (var i = 0; i < this.settings['Y']; i++) {
+                for (var j = 0; j < this.settings['X']; j++) {
+                    var id = this.GetId(j, i);
+                    console.log(i + " " + j + " " + this.nodeStatus[id] + " " + id);
                     
                     nodes.push(<Waypoint callback={this.NodeStateChange} id={id} style={this.nodeStatus[id]} />);
                 }
