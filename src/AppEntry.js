@@ -3,7 +3,7 @@ import Waypoint from './Waypoint.js';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import InputForm from './InputForm';
+import NumericField from './NumericField';
 
 const requestOptions = {
     method: 'POST',
@@ -74,7 +74,11 @@ class AppEntry extends React.Component {
     }
 
     ModifySettings(name, val){
-        this.settings[name] = val;
+
+        if (isNaN(val))
+        return;
+
+        this.settings[name] = parseInt(val);
         this.setState({ triggerRender: 0 });
     }
 
@@ -212,7 +216,7 @@ class AppEntry extends React.Component {
                 this.settings[settingsData[i].SETTING_NAME] = settingsData[i].SETTING_VALUE;
 
             console.log("Settings: " + this.settings);
-            //this.setState({ iteration: this.state.iteration+1 });
+            this.setState({ triggerRender: this.state.triggerRender+1 });
         });
 
         fetch('https://localhost:44391/RetrieveAllNodes', requestOptions).then(response => response.json()).then(data => {
@@ -261,7 +265,8 @@ class AppEntry extends React.Component {
                 <input type="text" value={this.settings['Y']} />
                 <br></br>
 
-                <input type="text" value={this.settings['INTERVAL']} onChange={(e) => this.ModifySettings("INTERVAL",parseInt(e.target.value))} />
+                {console.log("interval:" + this.settings['INTERVAL'])}
+                <NumericField startVal={"50"} />
                 <br></br>
 
                 <button onClick={this.BeginPathfinder}>
